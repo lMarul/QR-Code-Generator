@@ -20,7 +20,9 @@ import {
   Image,
   Download,
   Settings,
-  Sparkles
+  Sparkles,
+  Menu,
+  X
 } from 'lucide-react';
 import './App.css';
 
@@ -76,6 +78,7 @@ function App() {
   const [logoSize, setLogoSize] = useState(20);
   const [activeTab, setActiveTab] = useState('colors');
   const [finalQrCode, setFinalQrCode] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const canvasRef = useRef(null);
 
   // Add roundRect polyfill for older browsers
@@ -316,36 +319,49 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 overflow-hidden">
-      <div className="h-full flex flex-col">
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex flex-col h-screen">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">QR Code Generator</h1>
-          <p className="text-gray-600 mt-1">Create custom QR codes with advanced styling options</p>
+        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">QR Code Generator</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">Create custom QR codes with advanced styling options</p>
+            </div>
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex flex-col lg:flex-row">
           {/* Left Panel - Controls */}
-          <div className="w-2/3 bg-white border-r border-gray-200 overflow-y-auto">
-            <div className="p-6 space-y-6">
+          <div className={`w-full lg:w-2/3 bg-white border-r border-gray-200 overflow-y-auto transition-all duration-300 ${
+            isMobileMenuOpen ? 'block' : 'hidden lg:block'
+          }`}>
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               {/* Content Type Selection */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Content Type</h3>
-                <div className="grid grid-cols-6 gap-2">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Content Type</h3>
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                   {contentTypes.map((type) => {
                     const Icon = type.icon;
                     return (
                       <button
                         key={type.id}
                         onClick={() => setContentType(type.id)}
-                        className={`p-3 rounded-lg border-2 transition-all ${
+                        className={`p-2 sm:p-3 rounded-lg border-2 transition-all ${
                           contentType === type.id
                             ? 'border-blue-500 bg-blue-50 text-blue-700'
                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
-                        <Icon className="w-5 h-5 mx-auto mb-1" />
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" />
                         <span className="text-xs font-medium">{type.name}</span>
                       </button>
                     );
@@ -362,13 +378,13 @@ function App() {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder={getCurrentPlaceholder()}
-                  className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full h-20 sm:h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
 
               {/* Customization Tabs */}
               <div>
-                <div className="flex space-x-1 mb-4">
+                <div className="flex flex-wrap gap-1 mb-4">
                   {[
                     { id: 'colors', name: 'Colors', icon: Palette },
                     { id: 'shape', name: 'Shape', icon: Circle },
@@ -380,13 +396,13 @@ function App() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                           activeTab === tab.id
                             ? 'bg-blue-100 text-blue-700'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                         }`}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>{tab.name}</span>
                       </button>
                     );
@@ -394,12 +410,12 @@ function App() {
                 </div>
 
                 {/* Tab Content */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-gray-100 rounded-lg p-3 sm:p-4">
                   {activeTab === 'colors' && (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <div>
                         <h4 className="text-sm font-medium text-gray-700 mb-2">Color Presets</h4>
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {colorPresets.map((preset) => (
                             <button
                               key={preset.name}
@@ -411,7 +427,7 @@ function App() {
                             >
                               <div className="flex items-center space-x-2">
                                 <div
-                                  className="w-4 h-4 rounded border"
+                                  className="w-3 h-3 sm:w-4 sm:h-4 rounded border"
                                   style={{
                                     background: `linear-gradient(45deg, ${preset.fg} 50%, ${preset.bg} 50%)`
                                   }}
@@ -422,7 +438,7 @@ function App() {
                           ))}
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Foreground Color
@@ -431,7 +447,7 @@ function App() {
                             type="color"
                             value={foregroundColor}
                             onChange={(e) => setForegroundColor(e.target.value)}
-                            className="w-full h-10 rounded border border-gray-300"
+                            className="w-full h-8 sm:h-10 rounded border border-gray-300"
                           />
                         </div>
                         <div>
@@ -442,7 +458,7 @@ function App() {
                             type="color"
                             value={backgroundColor}
                             onChange={(e) => setBackgroundColor(e.target.value)}
-                            className="w-full h-10 rounded border border-gray-300"
+                            className="w-full h-8 sm:h-10 rounded border border-gray-300"
                           />
                         </div>
                       </div>
@@ -452,21 +468,21 @@ function App() {
                   {activeTab === 'shape' && (
                     <div>
                       <h4 className="text-sm font-medium text-gray-700 mb-3">QR Code Shape</h4>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         {shapeOptions.map((option) => {
                           const Icon = option.icon;
                           return (
                             <button
                               key={option.id}
                               onClick={() => setShape(option.id)}
-                              className={`p-3 rounded-lg border-2 transition-all ${
+                              className={`p-2 sm:p-3 rounded-lg border-2 transition-all ${
                                 shape === option.id
                                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                               }`}
                             >
-                              <Icon className="w-6 h-6 mx-auto mb-2" />
-                              <span className="text-sm font-medium">{option.name}</span>
+                              <Icon className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2" />
+                              <span className="text-xs sm:text-sm font-medium">{option.name}</span>
                             </button>
                           );
                         })}
@@ -477,18 +493,18 @@ function App() {
                   {activeTab === 'frame' && (
                     <div>
                       <h4 className="text-sm font-medium text-gray-700 mb-3">Frame Style</h4>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
                         {frameStyles.map((style) => (
                           <button
                             key={style.id}
                             onClick={() => setFrameStyle(style.id)}
-                            className={`p-3 rounded-lg border-2 transition-all ${
+                            className={`p-2 sm:p-3 rounded-lg border-2 transition-all ${
                               frameStyle === style.id
                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                             }`}
                           >
-                            <span className="text-sm font-medium">{style.name}</span>
+                            <span className="text-xs sm:text-sm font-medium">{style.name}</span>
                           </button>
                         ))}
                       </div>
@@ -496,7 +512,7 @@ function App() {
                   )}
 
                   {activeTab === 'logo' && (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Upload Logo
@@ -531,31 +547,31 @@ function App() {
           </div>
 
           {/* Right Panel - Preview */}
-          <div className="w-1/3 bg-gray-50 p-6">
+          <div className={`w-full lg:w-1/3 bg-gray-50 p-4 sm:p-6 ${isMobileMenuOpen ? 'hidden lg:block' : 'block'}`}>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Preview</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Preview</h3>
               
               {/* QR Code Display */}
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200">
                 {finalQrCode ? (
                   <div className="flex flex-col items-center space-y-4">
                     <img
                       src={finalQrCode}
                       alt="QR Code"
-                      className="max-w-full h-auto rounded-lg"
+                      className="max-w-full h-auto rounded-lg max-h-64 sm:max-h-80"
                     />
                     <button
                       onClick={downloadQRCode}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto justify-center"
                     >
                       <Download className="w-4 h-4" />
                       <span>Download PNG</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                    <Sparkles className="w-12 h-12 mb-2" />
-                    <p className="text-sm">Enter content to generate QR code</p>
+                  <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-gray-500">
+                    <Sparkles className="w-8 h-8 sm:w-12 sm:h-12 mb-2" />
+                    <p className="text-sm text-center">Enter content to generate QR code</p>
                   </div>
                 )}
               </div>
